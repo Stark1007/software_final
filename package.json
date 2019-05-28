@@ -1,0 +1,32 @@
+{
+  "name": "mygame",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run abc &&echo \"open localhost:8080/\" && npm run bro",
+    "bro": "./node_modules/.bin/browservefy index.js 8080 -- -d",
+    "abc": "browserify index.js -o bundle.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browservefy": "0.0.10",
+    "voxel-engine": "^0.20.2",
+    "voxel-player": "^0.1.0"
+  },
+  "dependencies": {
+    "kb-controls": "^0.2.0",
+    "voxel-clouds": "^0.2.0",
+    "voxel-control": "^1.0.0",
+    "voxel-controls": "^0.1.0",
+    "voxel-dummy-player": "^0.1.1",
+    "voxel-fly": "^0.1.2",
+    "voxel-forest": "0.0.1",
+    "voxel-perlin-terrain": "^1.0.0",
+    "voxel-reach": "^0.2.2",
+    "voxel-simplex-terrain": "0.0.3",
+    "voxel-trees": "^0.1.0"
+  }
+}
