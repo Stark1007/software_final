@@ -3,18 +3,22 @@ var terrain = require('voxel-perlin-terrain');
 var createReach = require('voxel-reach');
 var chunkSize = 32;
 var generateChunk = terrain('foo', 0, 5, 20);
+var createTree = require('voxel-forest');
+
 var game = createGame({
   materials: [
     'obsidian',
     ['grass', 'dirt', 'grass_dirt'],
     'whitewool',
     'plank',
+    'grass_top', 
+    'tree_side', 
+    'leaves_opaque'
   ],
   texturePath: 'textures/',
   generateChunks: false,
   controls: { discreteFire: true }
 });
-
 game.voxels.on('missingChunk', function(p) {
     var voxels = generateChunk(p, chunkSize)
     var chunk = {
@@ -24,6 +28,8 @@ game.voxels.on('missingChunk', function(p) {
       value: 2
     }
     game.showChunk(chunk)
+    setTimeout(function(){createTree(game, {position:{x:0, y:0, z:0}, leaves:7, bark:6})}, 500)
+
 })
 
 var container = document.body;
@@ -36,12 +42,18 @@ dude.yaw.position.set(0, 7, 0);
 // var controlplayer = require('voxel-control')(state, opts);
 // controlplayer.target(dude);
 window.addEventListener('keydown', function (ev) {
-
   if (ev.keyCode === 'J'.charCodeAt(0)&&dude.velocity.y <= 0.5) {
-    console.log('j');
+  console.log('j');;
+  };
+  if(ev.code === 'Space'){
+    console.log('space');
     dude.move(0, 3, 0);
   }
 });
+
+// window.addEventListener("mousedown", function(){
+//   console.log('down');
+// });
 //change element
 reach = createReach(game, {reachDistance: 8});
 
@@ -73,5 +85,4 @@ var clouds = require('voxel-clouds')({
 });
 game.on('tick', clouds.tick.bind(clouds));
 //forest
-// var createTree = require('voxel-forest');
-// createTree(game);
+

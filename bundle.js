@@ -45454,6 +45454,7 @@ module.exports = function(seed, floor, ceiling, divisor) {
         var idx = xidx + yidx * width + zidx * width * width
         chunk[idx] = 1
         chunk[idx+width]=2
+        chunk[idx+width*2]=2
       }
     })
     return chunk
@@ -45985,6 +45986,147 @@ function fract(f) {
 }
 
 module.exports = fract;
+
+});
+
+require.define("/node_modules/voxel-forest/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"index.js"}
+});
+
+require.define("/node_modules/voxel-forest/index.js",function(require,module,exports,__dirname,__filename,process,global){module.exports = function (game, opts) {
+    if (!opts) opts = {};
+    if (opts.bark === undefined) opts.bark = 1;
+    if (opts.leaves === undefined) opts.leaves = 2;
+    if (!opts.height) opts.height = Math.random() * 8 + 4;
+    if (opts.base === undefined) opts.base = opts.height / 3;
+    if (opts.radius === undefined) opts.radius = opts.base;
+
+    var voxels = game.voxels;
+    var bounds = boundingChunks(voxels.chunks);
+    var step = voxels.chunkSize * voxels.cubeSize;
+    if (opts.position) {
+        var chunk = voxels.chunks[randomChunk(bounds)];
+        opts.position.x = Math.floor((chunk.position[0] + Math.random()) * step);
+        opts.position.y = 6;
+        opts.position.z = Math.floor((chunk.position[2] + Math.random()) * step);
+    }
+    var pos_ = { x: opts.position.x, y: opts.position.y, z: opts.position.z };
+    function position () {
+        return { x: pos_.x, y: pos_.y, z: pos_.z };
+    }
+    //
+    var ymax = bounds.y.max * step;
+    var ymin = bounds.y.min * step;
+    if (occupied(pos_.y)) {
+        for (var y = pos_.y; occupied(y); y += voxels.cubeSize);
+        if (y >= ymax) return false;
+        pos_.y = y;
+    }
+    else {
+        for (var y = pos_.y; !occupied(y); y -= voxels.cubeSize);
+        if (y <= ymin) return false;
+        pos_.y = y + voxels.cubeSize;
+    }
+    function occupied (y) {
+        var pos = position();
+        pos.y = y;
+        return y <= ymax && y >= ymin && voxels.voxelAtPosition([pos.x,pos.y,pos.z]);
+    }
+    //
+    var sphere = function(x,y,z, r) {
+            return x*x + y*y + z*z <= r*r;
+    }
+    for (var y = 0; y < opts.height - 1; y++) {
+        var pos = position();
+        pos.y += y;
+        if (game.setBlock([pos.x, pos.y, pos.z], opts.bark)) break;
+    }
+    var radius = opts.radius;
+    for (var xstep = -radius; xstep <= radius; xstep++) {
+        for (var ystep = -radius; ystep <= radius; ystep++) {
+            for (var zstep = -radius; zstep <= radius; zstep++) {
+                if (sphere(xstep,ystep,zstep, radius)) {
+                    var leafpos = {
+                        x: pos.x + xstep,
+                        y: pos.y + ystep,
+                        z: pos.z + zstep
+                    }
+                    game.setBlock([leafpos.x, leafpos.y, leafpos.z], opts.leaves);
+                }
+            }
+        }
+    }
+
+    
+    // var updated = {};
+    // var around = [
+    //     [ 0, 1 ], [ 0, -1 ],
+    //     [ 1, 1 ], [ 1, 0 ], [ 1, -1 ],
+    //     [ -1, 1 ], [ -1, 0 ], [ -1, -1 ]
+    // ];
+    // for (var y = 0; y < opts.height - 1; y++) {
+    //     var pos = position();
+    //     pos.y += y * voxels.cubeSize;
+    //     if (set(pos, opts.bark)) break;
+    //     if (y < opts.base) continue;
+    //     around.forEach(function (offset) {
+    //         if (Math.random() > 0.5) return;
+    //         var x = offset[0] * voxels.cubeSize;
+    //         var z = offset[1] * voxels.cubeSize;
+    //         pos.x += x; pos.z += z;
+    //         set(pos, opts.leaves);
+    //         pos.x -= x; pos.z -= z;
+    //     });
+    // }
+    
+    // var pos = position();
+    // pos.y += y * voxels.cubeSize;
+    // set(pos, opts.leaves);
+    
+    // Object.keys(updated).forEach(function (key) {
+    //     game.showChunk(updated[key]);
+    // });
+    
+    function set (pos, value) {
+        // var ex = voxels.voxelAtPosition([pos.x,pos.y,pos.z]);
+        // if (ex) true;
+        // voxels.voxelAtPosition([pos.x,pos.y,pos.z], value);
+        // var c = voxels.chunkAtPosition([pos.x,pos.y,pos.z]);
+        // var key = c.join('|');
+        // if (!updated[key] && voxels.chunks[key]) {
+        //     updated[key] = voxels.chunks[key];
+        // }
+        game.setBlock([pos.x, pos.y, pos.z], value);
+    }
+};
+
+function randomChunk (bounds) {
+    var x = Math.random() * (bounds.x.max - bounds.x.min)*1.2 + bounds.x.min;
+    var y = Math.random() * (bounds.y.max - bounds.y.min) + bounds.y.min;
+    var z = Math.random() * (bounds.z.max - bounds.z.min)*1.2 + bounds.z.min;
+    console.log(x, y, z);
+    return [ x, y, z ].map(Math.floor).join('|');
+}
+
+function boundingChunks (chunks) {
+    return Object.keys(chunks).reduce(function (acc, key) {
+        var s = key.split('|');
+        if (acc.x.min === undefined) acc.x.min = s[0]
+        if (acc.x.max === undefined) acc.x.max = s[0]
+        if (acc.y.min === undefined) acc.y.min = s[1]
+        if (acc.y.max === undefined) acc.y.max = s[1]
+        if (acc.z.min === undefined) acc.z.min = s[2]
+        if (acc.z.max === undefined) acc.z.max = s[2]
+        
+        acc.x.min = Math.min(acc.x.min, s[0]);
+        acc.x.max = Math.max(acc.x.max, s[0]);
+        acc.y.min = Math.min(acc.y.min, s[1]);
+        acc.y.max = Math.max(acc.y.max, s[1]);
+        acc.z.min = Math.min(acc.z.min, s[2]);
+        acc.z.max = Math.max(acc.z.max, s[2]);
+        
+        return acc;
+    }, { x: {}, y: {}, z: {} });
+}
 
 });
 
@@ -46830,18 +46972,22 @@ var terrain = require('voxel-perlin-terrain');
 var createReach = require('voxel-reach');
 var chunkSize = 32;
 var generateChunk = terrain('foo', 0, 5, 20);
+var createTree = require('voxel-forest');
+
 var game = createGame({
   materials: [
     'obsidian',
     ['grass', 'dirt', 'grass_dirt'],
     'whitewool',
     'plank',
+    'grass_top', 
+    'tree_side', 
+    'leaves_opaque'
   ],
   texturePath: 'textures/',
   generateChunks: false,
   controls: { discreteFire: true }
 });
-
 game.voxels.on('missingChunk', function(p) {
     var voxels = generateChunk(p, chunkSize)
     var chunk = {
@@ -46851,6 +46997,8 @@ game.voxels.on('missingChunk', function(p) {
       value: 2
     }
     game.showChunk(chunk)
+    setTimeout(function(){createTree(game, {position:{x:0, y:0, z:0}, leaves:7, bark:6})}, 500)
+
 })
 
 var container = document.body;
@@ -46859,16 +47007,22 @@ game.appendTo(container);
 var createPlayer = require('voxel-player')(game);
 var dude = createPlayer('dude.png');
 dude.possess();
-dude.yaw.position.set(0, 5, 0);
+dude.yaw.position.set(0, 7, 0);
 // var controlplayer = require('voxel-control')(state, opts);
 // controlplayer.target(dude);
 window.addEventListener('keydown', function (ev) {
-
   if (ev.keyCode === 'J'.charCodeAt(0)&&dude.velocity.y <= 0.5) {
-    console.log('j');
+  console.log('j');;
+  };
+  if(ev.code === 'Space'){
+    console.log('space');
     dude.move(0, 3, 0);
   }
 });
+
+// window.addEventListener("mousedown", function(){
+//   console.log('down');
+// });
 //change element
 reach = createReach(game, {reachDistance: 8});
 
@@ -46878,29 +47032,17 @@ reach.on('use', function(target) {
 });
 
 reach.on('mining', function(target) { 
-  console.log(game.getBlock(target.voxel));
   if (target&&game.getBlock(target.voxel)!=1){
     game.setBlock(target.voxel, 0);
   }
   });
 //cloud
 var clouds = require('voxel-clouds')({
-  
-  // pass a copy of the game
   game: game,
-
-  // how high up the clouds should be from the player
   high: 10,
-
-  // the distance from the player the clouds should repeat
   distance: 300,
-
-  // how many clouds to generate
   many: 100,
-
-  // how fast the clouds should move
   speed: 0.01,
-
   // material of the clouds
   material: new game.THREE.MeshBasicMaterial({
     emissive: 0xffffff,
@@ -46910,11 +47052,10 @@ var clouds = require('voxel-clouds')({
     opacity: 0.5,
   }),
 });
-// on tick, move the clouds
 game.on('tick', clouds.tick.bind(clouds));
 //forest
-// var createTree = require('voxel-forest');
-// createTree(game);
+
+
 });
 require("/index.js");
 })();
