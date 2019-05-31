@@ -12,8 +12,8 @@ var game = createGame({
     'whitewool',
     'plank',
     'grass_top', 
-    'tree_side', 
-    'leaves_opaque'
+    ['tree', 'tree', 'tree_side'], 
+    ['leave_side', 'leave_side', 'leave1']
   ],
   texturePath: 'textures/',
   generateChunks: false,
@@ -70,7 +70,7 @@ reach.on('mining', function(target) {
 //cloud
 var clouds = require('voxel-clouds')({
   game: game,
-  high: 10,
+  high: 12,
   distance: 300,
   many: 100,
   speed: 0.01,

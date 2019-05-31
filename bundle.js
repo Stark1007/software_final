@@ -46103,7 +46103,6 @@ function randomChunk (bounds) {
     var x = Math.random() * (bounds.x.max - bounds.x.min)*1.2 + bounds.x.min;
     var y = Math.random() * (bounds.y.max - bounds.y.min) + bounds.y.min;
     var z = Math.random() * (bounds.z.max - bounds.z.min)*1.2 + bounds.z.min;
-    console.log(x, y, z);
     return [ x, y, z ].map(Math.floor).join('|');
 }
 
@@ -46981,8 +46980,8 @@ var game = createGame({
     'whitewool',
     'plank',
     'grass_top', 
-    'tree_side', 
-    'leaves_opaque'
+    ['tree', 'tree', 'tree_side'], 
+    ['leave_side', 'leave_side', 'leave1']
   ],
   texturePath: 'textures/',
   generateChunks: false,
