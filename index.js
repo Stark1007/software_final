@@ -39,21 +39,7 @@ var createPlayer = require('voxel-player')(game);
 var dude = createPlayer('dude.png');
 dude.possess();
 dude.yaw.position.set(0, 7, 0);
-// var controlplayer = require('voxel-control')(state, opts);
-// controlplayer.target(dude);
-window.addEventListener('keydown', function (ev) {
-  if (ev.keyCode === 'J'.charCodeAt(0)&&dude.velocity.y <= 0.5) {
-  console.log('j');;
-  };
-  if(ev.code === 'Space'){
-    console.log('space');
-    dude.move(0, 3, 0);
-  }
-});
 
-// window.addEventListener("mousedown", function(){
-//   console.log('down');
-// });
 //change element
 reach = createReach(game, {reachDistance: 8});
 
@@ -84,5 +70,14 @@ var clouds = require('voxel-clouds')({
   }),
 });
 game.on('tick', clouds.tick.bind(clouds));
-//forest
-
+//control
+// var controlplayer = require('voxel-control');
+// window.addEventListener('keydown', function (ev) {
+//   // if (ev.keyCode === 'J'.charCodeAt(0)&&dude.velocity.y <= 0.5) {
+//   // console.log('j');;
+//   // };
+//   if(ev.code === 'Space'){
+//     console.log('space');
+//     controlplayer(state.jump = true,);
+//   }
+// });

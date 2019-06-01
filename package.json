@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "kb-controls": "^0.2.0",
+    "stream": "0.0.2",
     "voxel-clouds": "^0.2.0",
     "voxel-control": "^1.0.0",
     "voxel-controls": "^0.1.0",

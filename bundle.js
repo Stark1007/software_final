@@ -39481,6 +39481,9 @@ function clamp(value, to) {
 
 });
 
+require.define("/node_modules/stream/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"index.js"}
+});
+
 require.define("stream",function(require,module,exports,__dirname,__filename,process,global){var events = require('events');
 var util = require('util');
 
@@ -47007,21 +47010,7 @@ var createPlayer = require('voxel-player')(game);
 var dude = createPlayer('dude.png');
 dude.possess();
 dude.yaw.position.set(0, 7, 0);
-// var controlplayer = require('voxel-control')(state, opts);
-// controlplayer.target(dude);
-window.addEventListener('keydown', function (ev) {
-  if (ev.keyCode === 'J'.charCodeAt(0)&&dude.velocity.y <= 0.5) {
-  console.log('j');;
-  };
-  if(ev.code === 'Space'){
-    console.log('space');
-    dude.move(0, 3, 0);
-  }
-});
 
-// window.addEventListener("mousedown", function(){
-//   console.log('down');
-// });
 //change element
 reach = createReach(game, {reachDistance: 8});
 
@@ -47038,7 +47027,7 @@ reach.on('mining', function(target) {
 //cloud
 var clouds = require('voxel-clouds')({
   game: game,
-  high: 10,
+  high: 12,
   distance: 300,
   many: 100,
   speed: 0.01,
@@ -47052,9 +47041,17 @@ var clouds = require('voxel-clouds')({
   }),
 });
 game.on('tick', clouds.tick.bind(clouds));
-//forest
-
-
+//control
+// var controlplayer = require('voxel-control');
+// window.addEventListener('keydown', function (ev) {
+//   // if (ev.keyCode === 'J'.charCodeAt(0)&&dude.velocity.y <= 0.5) {
+//   // console.log('j');;
+//   // };
+//   if(ev.code === 'Space'){
+//     console.log('space');
+//     controlplayer(state.jump = true,);
+//   }
+// });
 });
 require("/index.js");
 })();
