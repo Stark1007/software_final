@@ -29,7 +29,7 @@ game.voxels.on('missingChunk', function(p) {
     }
     game.showChunk(chunk)
     setTimeout(function(){createTree(game, {position:{x:0, y:0, z:0}, leaves:7, bark:6})}, 500)
-
+    console.log('1');
 })
 
 var container = document.body;
